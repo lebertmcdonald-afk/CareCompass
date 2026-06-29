@@ -1,0 +1,13 @@
+{
+  "name": "care-compass",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "preview": "turbo run preview"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  }
+}
