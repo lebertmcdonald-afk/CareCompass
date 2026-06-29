@@ -1,19 +1,18 @@
-/** Returns up to maxResults adjacent counties that have at least 1 home care agency.
- *  Used when the family's county is a care desert — surfaces the nearest non-desert options.
+/** Returns up to 3 adjacent non-desert counties ordered by agency count descending.
+ *  Used by Door 1 ResourcePanel when the family's county is a care desert.
  *
- *  @param fips         FIPS of the desert county
- *  @param adjacency    Pre-indexed { [fips]: adjacentFips[] } — built from county-adjacency.csv
- *  @param countyByFips Pre-indexed { [fips]: CountyFeature } — built from computeFillValues()
- *  @param maxResults   Max results to return (default 5) */
+ *  @param fips        FIPS of the desert county
+ *  @param allCounties Full CountyFeature[] from computeFillValues() — searched for adjacent matches
+ *  @param adjacency   Pre-indexed { [fips]: adjacentFips[] } — built from county-adjacency.csv */
 export function getNearestCountiesWithAgencies(
   fips: string,
+  allCounties: Array<{ fips: string; agencyCount?: number; [key: string]: unknown }>,
   adjacency: Record<string, string[]>,
-  countyByFips: Record<string, { agencyCount?: number; [key: string]: unknown }>,
-  maxResults = 5,
+  maxResults = 3,
 ) {
-  const adjacent = adjacency[fips] ?? []
-  return adjacent
-    .map(f => countyByFips[f])
-    .filter((c): c is CountyFeature => !!c && (c.agencyCount ?? 0) > 0)
+  const adjacentFips = new Set(adjacency[fips] ?? [])
+  return allCounties
+    .filter(c => adjacentFips.has(c.fips) && (c.agencyCount ?? 0) > 0)
+    .sort((a, b) => (b.agencyCount ?? 0) - (a.agencyCount ?? 0))
     .slice(0, maxResults)
 }

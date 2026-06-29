@@ -27,10 +27,10 @@ export function MapEngine({
   useEffect(() => {
     if (!mapRef.current || leafletRef.current) return
     leafletRef.current = L.map(mapRef.current).setView([37.8, -96], 4)
-    // County GeoJSON layer, tooltip binding, pin overlay, and click handlers — Day 3
+    // County GeoJSON layer, tooltip binding, pin overlay, click handlers — Day 3
   }, [])
 
-  // Scaffold: params used in Day 3 implementation
+  // Scaffold: all props used in Day 3 implementation
   void mode; void counties; void focusedCountyFips; void onCountyClick
   void overlayPins; void colorScale; void isLoading
 
