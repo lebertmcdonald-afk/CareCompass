@@ -1,13 +1,23 @@
 {
   "name": "ui",
-  "version": "1.0.0",
-  "main": "index.js",
-  "dependencies": {
-    "react": "^18.2.0"
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./theme.css": "./theme.css",
+    "./MapEngine.css": "./MapEngine.css"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@types/leaflet": "file:../../node_modules/@types/leaflet",
+    "@types/leaflet": "^1.9.14",
     "@types/react": "file:../../node_modules/@types/react",
-    "leaflet": "file:../../node_modules/leaflet"
+    "leaflet": "^1.9.4"
+  },
+  "dependencies": {
+    "react-leaflet": "^4.2.1"
   }
 }
