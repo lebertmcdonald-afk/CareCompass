@@ -176,7 +176,9 @@ Move to resolved once addressed in build. Do not delete — add resolution date 
 | # | Item | Screen | Status |
 |---|---|---|---|
 | O1 | Verify ZIP-to-county crosswalk behavior for ZIPs spanning multiple county lines | Both | Open — Lee, Day 1 |
-| O2 | Lock choropleth map library dependency before scaffolding MapEngine component API | Both | Open — Both, Day 1 |
+| O2 | Lock choropleth map library dependency before scaffolding MapEngine component API | Both | Resolved — 2026-06-30, see D08. Library choice (Leaflet + free GeoJSON) was locked in D08; only the react-leaflet/React 19 version conflict remained open, tracked separately as O6. |
 | O3 | Run Door 1 WCAG audit against Figma Make output before committing Door 1 CSS | Compass | Open — Lee, Day 3 |
 | O4 | Confirm demo ZIP codes (85145, 85139, 85128) against Lee's dataset | Both | Open — Lee, Day 1 |
 | O5 | Flag CTA confirmation state (post-click text + visual) not yet mocked | Compass | Open — Build |
+| O6 | react-leaflet / React 19 peer dependency conflict — blocks MapEngine rendering for both doors | Both | Open — Both, Day 2 |
+
