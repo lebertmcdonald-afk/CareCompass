@@ -1,4 +1,4 @@
-export { MapEngine } from './MapEngine'
+export { MapEngine } from './MapEngine/MapEngine'
 export type {
   MapEngineProps,
   CountyFeature,
@@ -10,5 +10,5 @@ export type {
   DataSource,
   PinType,
   PinStatus,
-} from './MapEngine.types'
-export { DEFAULT_COLOR_SCALE } from './MapEngine.types'
+} from './MapEngine/MapEngine.types'
+export { DEFAULT_COLOR_SCALE } from './MapEngine/MapEngine.types'
