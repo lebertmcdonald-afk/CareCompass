@@ -4,5 +4,10 @@
   "main": "index.js",
   "dependencies": {
     "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/leaflet": "file:../../node_modules/@types/leaflet",
+    "@types/react": "file:../../node_modules/@types/react",
+    "leaflet": "file:../../node_modules/leaflet"
   }
 }
