@@ -155,6 +155,8 @@ const [focused, setFocused] = useState<string | null>(null)
   isLoading={isLoading}
   dataSource="static"
   disclaimerText={null}             // uses default CMS/Census disclaimer
+  // GeoJSON county boundaries — fetched from /assets/us-counties-20m.geojson
+  geojsonData={geojsonData ?? undefined}
 />
 ```
 
@@ -188,6 +190,8 @@ const [pins, setPins]           = useState<OverlayPin[]>([])
   isLoading={isLoading}
   dataSource="live"
   disclaimerText={null}             // uses default demo disclaimer
+  // GeoJSON county boundaries — fetched from /assets/us-counties-20m.geojson
+  geojsonData={geojsonData ?? undefined}
 />
 ```
 

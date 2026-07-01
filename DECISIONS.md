@@ -179,6 +179,18 @@ Copy this template and append it to the relevant section (Design, Architecture, 
 
 ---
 
+### A05 — geojsonData passed as prop to MapEngine; not fetched internally
+
+**Decision:** County boundary GeoJSON (us-counties-20m.geojson) is fetched by the parent page and passed into MapEngine via an optional `geojsonData?: GeoJSON.FeatureCollection` prop. MapEngine does not fetch the file itself.
+
+**Rationale:** Consistent with MapEngine's existing contract — Section 3 explicitly lists "Data fetching" as not MapEngine's responsibility. Passing GeoJSON as a prop keeps MapEngine stateless with respect to asset loading, allows each door to control its own fetch lifecycle, and means Door 2 can pass the same boundary file from a different asset path if needed without touching shared component code.
+
+**Rejected:** Fetching us-counties-20m.geojson inside MapEngine on mount. Rejected — would couple a shared component to a specific asset path, violate the contract's data-fetching boundary, and make it impossible for Door 2 to control when boundaries load relative to its Supabase data.
+
+**Note:** @types/geojson added explicitly to packages/ui/package.json devDependencies in the same commit — previously only present transitively via @types/leaflet.
+
+---
+
 ## Open Items
 
 Move to resolved once addressed in build. Do not delete — add resolution date and note.
