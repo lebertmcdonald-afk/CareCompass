@@ -203,6 +203,7 @@ Optional fields: nickname, preferred language, gender preference for aide, one c
 | `public.caregiver_profiles` | One record per caregiver — supply side |
 | `public.assignments_log` | Full audit trail — every assignment action |
 | `public.coordinator_profiles` | User and auth management |
+| `public.demand_signals` | Anonymous ZIP-level demand flags from Door 1 — no PII; INSERT open to anon, SELECT restricted to authenticated |
 
 `assignments_log` must capture: coordinator ID, client ID, caregiver ID, timestamp, match score, and optional note. No assignment action is untracked.
 
