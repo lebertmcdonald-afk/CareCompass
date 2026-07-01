@@ -169,6 +169,16 @@ Copy this template and append it to the relevant section (Design, Architecture, 
 
 ---
 
+### A04 — Upgrade react-leaflet to 5.0.0 to resolve React 19 peer dependency conflict
+
+**Decision:** Upgraded react-leaflet to 5.0.0 across all four workspaces. All four workspaces build clean post-upgrade.
+
+**Rationale:** react-leaflet 4.x declared peer dependencies on React 17 and 18 only. With the project running React 19, pnpm reported an unresolvable peer conflict that blocked clean installs and caused MapEngine rendering to fail in both doors. react-leaflet 5.0.0 drops the React version pin and declares React 18+ (including 19) as a valid peer, resolving the conflict without any changes to calling code.
+
+**Rejected:** Downgrading to React 18 — rejected because React 19 is the project standard and would require auditing all React 19-specific API usage. Using `--legacy-peer-deps` or pnpm overrides — rejected because it papers over the conflict without resolving it; CI and fresh installs would still warn or fail. Patching react-leaflet 4.x `peerDependencies` manually — rejected because it creates a fork maintenance burden and doesn't receive upstream fixes.
+
+---
+
 ## Open Items
 
 Move to resolved once addressed in build. Do not delete — add resolution date and note.
@@ -180,5 +190,5 @@ Move to resolved once addressed in build. Do not delete — add resolution date 
 | O3 | Run Door 1 WCAG audit against Figma Make output before committing Door 1 CSS | Compass | Open — Lee, Day 3 |
 | O4 | Confirm demo ZIP codes (85145, 85139, 85128) against Lee's dataset | Both | Open — Lee, Day 1 |
 | O5 | Flag CTA confirmation state (post-click text + visual) not yet mocked | Compass | Open — Build |
-| O6 | react-leaflet / React 19 peer dependency conflict — blocks MapEngine rendering for both doors | Both | Open — Both, Day 2 |
+| O6 | react-leaflet / React 19 peer dependency conflict — blocks MapEngine rendering for both doors | Both | Resolved — 2026-06-30, see A04. Upgraded react-leaflet to 5.0.0; all four workspaces build clean. |
 
