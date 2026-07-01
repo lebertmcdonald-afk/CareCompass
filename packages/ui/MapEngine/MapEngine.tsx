@@ -17,10 +17,10 @@ const DEFAULT_DISCLAIMERS: Record<string, string> = {
 // ─── Color helpers ───────────────────────────────────────────────
 
 function fillValueToHex(fillValue: number, colorScale: ColorScale): string {
-  if (fillValue < 0)  return colorScale.noData
-  if (fillValue < 0.4) return colorScale.low
-  if (fillValue < 0.7) return colorScale.mid
-  return colorScale.high
+  if (fillValue < 0)    return colorScale.noData
+  if (fillValue < 0.05) return colorScale.low   // 0 agencies or near-zero
+  if (fillValue < 0.25) return colorScale.mid   // below-average coverage
+  return colorScale.high                         // above p75 relative to p95 cap
 }
 
 // ─── Pin rendering ───────────────────────────────────────────────
@@ -57,6 +57,7 @@ export function MapEngine({
   isLoading,
   dataSource,
   disclaimerText,
+  geojsonData,
 }: MapEngineProps) {
   const mapRef     = useRef<HTMLDivElement>(null)
   const leafletRef = useRef<L.Map | null>(null)
@@ -74,21 +75,6 @@ export function MapEngine({
 
     geoLayerRef.current = L.geoJSON(undefined, {
       style: () => ({ weight: 0.5, color: '#888', fillOpacity: 0.75 }),
-      onEachFeature: (feature: GeoJSON.Feature, layer: L.Layer) => {
-        const fips = (feature.properties?.STATE ?? '') + (feature.properties?.COUNTY ?? '')
-        const county = counties.find(c => c.fips === fips)
-
-        if (county) {
-          layer.bindTooltip(
-            `<strong>${county.tooltip.headline}</strong><br/>` +
-            county.tooltip.stats.map(s => `${s.label}: ${s.value}`).join('<br/>') +
-            `<br/><em>${county.tooltip.caveat}</em>`,
-            { sticky: true }
-          )
-        }
-
-        layer.on('click', () => onCountyClick(fips))
-      },
     }).addTo(leafletRef.current)
 
     pinLayerRef.current = L.layerGroup().addTo(leafletRef.current)
@@ -99,7 +85,28 @@ export function MapEngine({
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Update county fills when data changes ───────────────────────
+  // ── Load GeoJSON boundaries + bind tooltips and clicks ──────────
+  useEffect(() => {
+    if (!geoLayerRef.current || !geojsonData) return
+    geoLayerRef.current.clearLayers()
+    geoLayerRef.current.addData(geojsonData)
+    geoLayerRef.current.eachLayer(layer => {
+      const f = (layer as unknown as { feature?: GeoJSON.Feature }).feature
+      const fips = (f?.properties?.STATE ?? '') + (f?.properties?.COUNTY ?? '')
+      const county = counties.find(c => c.fips === fips)
+      if (county) {
+        (layer as L.Layer).bindTooltip(
+          `<strong>${county.tooltip.headline}</strong><br/>` +
+          county.tooltip.stats.map(s => `${s.label}: ${s.value}`).join('<br/>') +
+          `<br/><em>${county.tooltip.caveat}</em>`,
+          { sticky: true }
+        )
+      }
+      layer.on('click', () => onCountyClick(fips))
+    })
+  }, [geojsonData, counties, onCountyClick]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Update county fills and tooltips when data changes ─────────
   useEffect(() => {
     if (!geoLayerRef.current || counties.length === 0) return
 
@@ -109,7 +116,26 @@ export function MapEngine({
       const fill   = county ? fillValueToHex(county.fillValue, colorScale) : colorScale.noData
       return { fillColor: fill }
     })
-  }, [counties, colorScale])
+
+    geoLayerRef.current.eachLayer(layer => {
+      const gl    = layer as L.Path
+      const fips  = ((layer as unknown as { feature: GeoJSON.Feature }).feature?.properties?.STATE ?? '') + ((layer as unknown as { feature: GeoJSON.Feature }).feature?.properties?.COUNTY ?? '')
+      const county = counties.find(c => c.fips === fips)
+
+      gl.off('click')
+      gl.on('click', () => onCountyClick(fips))
+
+      if (county) {
+        gl.unbindTooltip()
+        gl.bindTooltip(
+          `<strong>${county.tooltip.headline}</strong><br/>` +
+          county.tooltip.stats.map(s => `${s.label}: ${s.value}`).join('<br/>') +
+          `<br/><em>${county.tooltip.caveat}</em>`,
+          { sticky: true }
+        )
+      }
+    })
+  }, [counties, colorScale, geojsonData, onCountyClick]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Highlight focused county ────────────────────────────────────
   useEffect(() => {

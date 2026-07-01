@@ -10,10 +10,11 @@ interface RawCountyRow {
 }
 
 export function computeFillValues(rows: RawCountyRow[]) {
-  const maxDensity = Math.max(...rows.map(r => r.per_1k_seniors), 0.001)
+  const sorted = [...rows.map(r => r.per_1k_seniors)].sort((a, b) => a - b)
+  const cap = Math.max(sorted[Math.floor(sorted.length * 0.95)] ?? 0.001, 0.001)
 
   return rows.map(r => {
-    const fillValue = r.per_1k_seniors / maxDensity
+    const fillValue = Math.min(r.per_1k_seniors / cap, 1.0)
 
     return {
       fips:                 r.fips,
@@ -25,7 +26,9 @@ export function computeFillValues(rows: RawCountyRow[]) {
       seniorPopulation:     r.seniors,
       isDesert:             r.is_desert === 'True',
       tooltip: {
-        headline: `${r.county}, ${r.state}`,
+        headline: r.is_desert === 'True'
+          ? `Care desert — ${r.agencies} ${r.agencies === 1 ? 'agency' : 'agencies'}`
+          : `${r.county}, ${r.state}`,
         stats: [
           { label: 'Home health agencies',    value: String(r.agencies) },
           { label: 'Agencies per 1k seniors', value: r.per_1k_seniors.toFixed(1) },
