@@ -1,0 +1,251 @@
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+import { Banner } from '../components/Banner'
+import './DignityProfilePage.css'
+
+type Mode = 'create' | 'edit' | 'view'
+
+type FormState = {
+  name: string
+  nickname: string
+  preferred_language: string
+  comfort_note: string
+  avoid_note: string
+}
+
+const EMPTY_FORM: FormState = {
+  name: '',
+  nickname: '',
+  preferred_language: '',
+  comfort_note: '',
+  avoid_note: '',
+}
+
+export function DignityProfilePage({ mode }: { mode: Mode }) {
+  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+
+  const [form, setForm] = useState<FormState>(EMPTY_FORM)
+  const [isLoading, setIsLoading] = useState(mode !== 'create')
+  const [isSaving, setIsSaving] = useState(false)
+  const [banner, setBanner] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
+  useEffect(() => {
+    if (mode === 'create' || !id) return
+    supabase
+      .from('client_profiles')
+      .select('name, nickname, preferred_language, comfort_note, avoid_note')
+      .eq('id', id)
+      .single()
+      .then(({ data, error }) => {
+        if (error || !data) {
+          setBanner({ type: 'error', message: 'Failed to load client profile.' })
+        } else {
+          setForm({
+            name: data.name ?? '',
+            nickname: data.nickname ?? '',
+            preferred_language: data.preferred_language ?? '',
+            comfort_note: data.comfort_note ?? '',
+            avoid_note: data.avoid_note ?? '',
+          })
+        }
+        setIsLoading(false)
+      })
+  }, [id, mode])
+
+  function handleChange(field: keyof FormState) {
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setForm(prev => ({ ...prev, [field]: e.target.value }))
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!form.name.trim()) return
+    setIsSaving(true)
+    setBanner(null)
+
+    const payload = {
+      name: form.name.trim(),
+      nickname: form.nickname.trim() || null,
+      preferred_language: form.preferred_language.trim() || null,
+      comfort_note: form.comfort_note.trim() || null,
+      avoid_note: form.avoid_note.trim() || null,
+    }
+
+    if (mode === 'create') {
+      const { data, error } = await supabase
+        .from('client_profiles')
+        .insert(payload)
+        .select('id')
+        .single()
+      if (error || !data) {
+        setBanner({ type: 'error', message: `Save failed: ${error?.message ?? 'Unknown error'}` })
+        setIsSaving(false)
+      } else {
+        navigate(`/clients/${data.id}`, { replace: true })
+      }
+    } else {
+      const { error } = await supabase
+        .from('client_profiles')
+        .update(payload)
+        .eq('id', id!)
+      if (error) {
+        setBanner({ type: 'error', message: `Save failed: ${error.message}` })
+        setIsSaving(false)
+      } else {
+        navigate(`/clients/${id}`, { replace: true })
+      }
+    }
+  }
+
+  const isReadOnly = mode === 'view'
+
+  const pageTitle =
+    mode === 'create' ? 'New client' :
+    mode === 'edit'   ? 'Edit profile' :
+    form.name || 'Client profile'
+
+  if (isLoading) {
+    return (
+      <main className="profile-page">
+        <p className="profile-loading">Loading…</p>
+      </main>
+    )
+  }
+
+  return (
+    <main className="profile-page">
+      <div className="profile-card">
+        <header className="profile-header">
+          <h1 className="profile-title">{pageTitle}</h1>
+          {isReadOnly && (
+            <div className="profile-header-actions">
+              <button className="btn-outline" onClick={() => window.print()}>Print</button>
+              <button className="btn-primary" onClick={() => navigate(`/clients/${id}/edit`)}>Edit</button>
+            </div>
+          )}
+        </header>
+
+        {banner && (
+          <Banner type={banner.type} message={banner.message} onDismiss={() => setBanner(null)} />
+        )}
+
+        <form className="profile-form" onSubmit={handleSubmit} noValidate>
+          <div className="field-group">
+            <label className="field-label" htmlFor="field-name">
+              Name <span className="field-required" aria-hidden="true">*</span>
+            </label>
+            {isReadOnly ? (
+              <p id="field-name" className="field-value">{form.name || '—'}</p>
+            ) : (
+              <input
+                id="field-name"
+                type="text"
+                className="field-input"
+                value={form.name}
+                onChange={handleChange('name')}
+                required
+                aria-required="true"
+                autoComplete="off"
+              />
+            )}
+          </div>
+
+          <div className="field-group">
+            <label className="field-label" htmlFor="field-nickname">
+              Nickname <span className="field-optional">optional</span>
+            </label>
+            {isReadOnly ? (
+              <p id="field-nickname" className="field-value">{form.nickname || '—'}</p>
+            ) : (
+              <input
+                id="field-nickname"
+                type="text"
+                className="field-input"
+                value={form.nickname}
+                onChange={handleChange('nickname')}
+                autoComplete="off"
+              />
+            )}
+          </div>
+
+          <div className="field-group">
+            <label className="field-label" htmlFor="field-language">
+              Preferred language <span className="field-optional">optional</span>
+            </label>
+            {isReadOnly ? (
+              <p id="field-language" className="field-value">{form.preferred_language || '—'}</p>
+            ) : (
+              <input
+                id="field-language"
+                type="text"
+                className="field-input"
+                value={form.preferred_language}
+                onChange={handleChange('preferred_language')}
+                placeholder="e.g. Spanish, Mandarin"
+                autoComplete="off"
+              />
+            )}
+          </div>
+
+          <div className="field-group">
+            <label className="field-label" htmlFor="field-comfort">
+              Key thing to know <span className="field-optional">optional</span>
+            </label>
+            <p className="field-hint">One comfort or important context for caregivers</p>
+            {isReadOnly ? (
+              <p id="field-comfort" className="field-value">{form.comfort_note || '—'}</p>
+            ) : (
+              <textarea
+                id="field-comfort"
+                className="field-textarea"
+                value={form.comfort_note}
+                onChange={handleChange('comfort_note')}
+                rows={3}
+              />
+            )}
+          </div>
+
+          <div className="field-group">
+            <label className="field-label" htmlFor="field-avoid">
+              Key thing to avoid <span className="field-optional">optional</span>
+            </label>
+            <p className="field-hint">One trigger or avoid note for caregivers</p>
+            {isReadOnly ? (
+              <p id="field-avoid" className="field-value">{form.avoid_note || '—'}</p>
+            ) : (
+              <textarea
+                id="field-avoid"
+                className="field-textarea"
+                value={form.avoid_note}
+                onChange={handleChange('avoid_note')}
+                rows={3}
+              />
+            )}
+          </div>
+
+          <div className="profile-actions">
+            <button type="button" className="btn-ghost" onClick={() => navigate(-1)}>
+              {isReadOnly ? 'Back' : 'Cancel'}
+            </button>
+            {mode === 'edit' && (
+              <button type="button" className="btn-outline" onClick={() => window.print()}>
+                Print
+              </button>
+            )}
+            {!isReadOnly && (
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={!form.name.trim() || isSaving}
+              >
+                {isSaving ? 'Saving…' : 'Save profile'}
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+    </main>
+  )
+}

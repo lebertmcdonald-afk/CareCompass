@@ -135,6 +135,45 @@ Copy this template and append it to the relevant section (Design, Architecture, 
 
 ---
 
+### D13 — "Add new client" uses a route, not a modal
+
+**Decision:** Clicking "Add new client" on the Clients List navigates to /clients/new, a full route, rather than opening a modal over the list.
+
+**Rationale:** Consistent with D01's sidebar-only navigation logic — Console favors single, unambiguous focus over layered UI patterns. Avoids modal accessibility overhead (focus trap, escape-key handling, scroll lock) for a six-field form that warrants full screen space. Matches A03's precedent of not building infrastructure ahead of need.
+
+**Rejected:** Modal over the Clients List. Rejected — adds interaction pattern complexity for a single entry point with no requirement to preserve list context.
+
+---
+
+### D11 — Typography scale locked to six-token system
+
+**Decision:** All font sizes across both doors use the following named tokens, replacing the prior Display/Hero, Section heading, Body, Emphasis, Label/Tag, Caption role-based scale from design_system.md:
+
+--text-xs:   0.75rem   (12px) — captions, caveats, disclaimer footer
+--text-sm:   0.875rem  (14px) — secondary labels, tags, stat values
+--text-base: 1rem      (16px) — body, form fields, panel content
+--text-lg:   1.125rem  (18px) — card headers, panel titles
+--text-xl:   1.25rem   (20px) — page section headers
+--text-2xl:  1.5rem    (24px) — primary page title, wordmark
+
+No component may use a literal px or rem value for font-size — tokens only.
+
+**Rationale:** The original role-based scale (Display/Hero 24-32px, Section heading 16px, Body 14px, Label/Tag 11-12px) produced inconsistent literal values in practice — ClientsListPage independently chose 20px for a heading against a locked 16px value, and the Figma Make mock for Door 1 showed the "0 agencies" stat headline oversized and the wordmark undersized against any of the original role definitions. A named token scale with an enforced no-literal-values rule closes that drift path going forward.
+
+**Rejected:** Keeping the role-based table as-is and fixing individual literal-value bugs as they appear. Rejected — this is the second drift incident (ClientsListPage heading, now the Door 1 mock) and a token system prevents the class of bug rather than patching instances of it.
+
+---
+
+### D12 — Lucide React for icon system; currentColor inheritance only
+
+**Decision:** Lucide React is the icon library for both doors. Icons inherit `currentColor` by default and may not introduce their own color values. If an icon needs color emphasis, it uses an existing token only — `--orange-alert` for urgency, `--teal-action` for interactive icons — never a new value.
+
+**Rationale:** Lucide is tree-shakeable, has zero-config React/Vite integration, and its stroke-based style matches the calm, non-decorative tone established in D09 (no SVG text labels) and D02 (strict color-function separation). The currentColor/no-new-tokens rule prevents icon color from reopening the Von Restorff conflict D02 already resolved between urgency badges and action buttons.
+
+**Rejected:** Heroicons. Comparable quality, no decisive advantage over Lucide for this scope — decision made on team preference, not a technical differentiator. Also rejected: allowing icons their own color tokens. Rejected — would let icon color drift into urgency/action territory the same way D02 already had to correct for badges and buttons.
+
+---
+
 ## Architecture Decisions
 
 ### A01 — Two-door architecture; one monorepo

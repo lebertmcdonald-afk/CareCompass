@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { LoginPage } from './pages/LoginPage'
 import { ClientsListPage } from './pages/ClientsListPage'
+import { DignityProfilePage } from './pages/DignityProfilePage'
 
 function App() {
   return (
@@ -15,6 +16,30 @@ function App() {
             element={
               <ProtectedRoute>
                 <ClientsListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/clients/new"
+            element={
+              <ProtectedRoute>
+                <DignityProfilePage mode="create" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/clients/:id/edit"
+            element={
+              <ProtectedRoute>
+                <DignityProfilePage mode="edit" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/clients/:id"
+            element={
+              <ProtectedRoute>
+                <DignityProfilePage mode="view" />
               </ProtectedRoute>
             }
           />

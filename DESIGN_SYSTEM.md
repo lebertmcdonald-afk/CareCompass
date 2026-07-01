@@ -70,23 +70,26 @@ Care Console (coordinator tool) and Care Compass (consumer tool) are visually di
 
 ## 2. Typography
 
+> Typography tokens locked per D11 — see DECISIONS.md.
+
 ### Type scale
 
-| Role | Family | Size | Weight | Usage |
-|---|---|---|---|---|
-| Display / Hero | Inter | 24–32px | 700 | "0 agencies" stat, hero headline |
-| Section heading | Inter | 16px | 600 | Panel titles, county name in panel |
-| Body | Inter | 14px | 400 | Card body text, resource descriptions |
-| Emphasis | Inter | 14px | 500 | Names, key numbers, bold inline |
-| Label / Tag | Inter | 11–12px | 500 | Section labels (uppercase), tags, chips |
-| Caption / Caveat | Inter | 12px | 400 | Footnotes, disclaimers, privacy notes |
-| Top bar tagline | Inter | 12px | 400 | Tagline only — `--text-muted-decorative` acceptable here as purely decorative |
+| Token | Value | px equiv | Usage |
+|---|---|---|---|
+| `--text-xs` | 0.75rem | 12px | Captions, caveats, disclaimer footer — replaces Caption / Caveat and Top bar tagline roles. `--text-muted-decorative` acceptable on purely decorative tagline use only. |
+| `--text-sm` | 0.875rem | 14px | Secondary labels, tags, stat values, resource descriptions — replaces Body (400) and Emphasis (500) roles. Weight distinguishes body (400) from emphasis (500). |
+| `--text-base` | 1rem | 16px | Body copy, form fields, panel content — minimum for paragraph-weight text. Replaces Section heading (600) at component level where 16px was already the correct choice. |
+| `--text-lg` | 1.125rem | 18px | Card headers, panel titles — replaces Section heading (600) at the card/panel scale. |
+| `--text-xl` | 1.25rem | 20px | Page section headers, sidebar nav items. |
+| `--text-2xl` | 1.5rem | 24px | Primary page title, wordmark — replaces Display / Hero role. Use weight 700. "0 agencies" stat headline and hero headline both fall here. |
+
+No component may use a literal `px` or `rem` value for `font-size` — tokens only.
 
 ### Typography rules
 
 - Inter is the only font family. No other families in scope for either screen.
-- Section labels use 11px uppercase with `letter-spacing: 0.08em`. Do not use uppercase for any other text role.
-- Minimum body text size is 14px. Never use 12px for body copy — captions only.
+- Section labels use `--text-xs` uppercase with `letter-spacing: 0.08em`. Do not use uppercase for any other text role.
+- Minimum body text size is `--text-sm` (14px). Never use `--text-xs` for body copy — captions only.
 - Hover tooltips on the map use `--text-primary` on `--surface` (white). No special map label font treatment.
 
 ---

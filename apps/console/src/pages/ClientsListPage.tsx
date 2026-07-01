@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 // Placeholder type — columns confirmed from CLAUDE.md Dignity Profile contract.
@@ -9,6 +10,7 @@ type ClientProfile = {
 }
 
 export function ClientsListPage() {
+  const navigate = useNavigate()
   const [clients, setClients] = useState<ClientProfile[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -80,8 +82,7 @@ export function ClientsListPage() {
 
           <button
             style={styles.ctaButton}
-            // TODO: wire to add-client flow — route vs. modal decision not yet made
-            onClick={() => {}}
+            onClick={() => navigate('/clients/new')}
           >
             Add new client
           </button>
@@ -105,7 +106,11 @@ export function ClientsListPage() {
         </thead>
         <tbody>
           {clients.map(c => (
-            <tr key={c.id}>
+            <tr
+              key={c.id}
+              style={{ ...styles.tr, cursor: 'pointer' }}
+              onClick={() => navigate(`/clients/${c.id}`)}
+            >
               <td style={styles.td}>{c.name}</td>
               <td style={styles.td}>—</td>
               <td style={styles.td}>—</td>
@@ -181,6 +186,9 @@ const styles: Record<string, React.CSSProperties> = {
     borderCollapse: 'collapse',
     fontFamily: 'var(--font-family)',
     fontSize: 'var(--font-size-body-min)',
+  },
+  tr: {
+    transition: 'background 0.1s',
   },
   th: {
     textAlign: 'left',

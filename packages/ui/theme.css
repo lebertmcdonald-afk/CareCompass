@@ -54,6 +54,14 @@
 
   /* ── Accent ── */
   --accent-bar:             4px; /* Left accent bar on result headline card */
+
+  /* ── Typography scale (D11) ── */
+  --text-xs:   0.75rem;    /* 12px — captions, caveats, disclaimer footer */
+  --text-sm:   0.875rem;   /* 14px — secondary labels, tags, stat values */
+  --text-base: 1rem;       /* 16px — body, form fields, panel content */
+  --text-lg:   1.125rem;   /* 18px — card headers, panel titles */
+  --text-xl:   1.25rem;    /* 20px — page section headers */
+  --text-2xl:  1.5rem;     /* 24px — primary page title, wordmark */
 }
 
 /* Base reset — Inter only, no other font families */
