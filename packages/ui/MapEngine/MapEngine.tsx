@@ -135,7 +135,7 @@ export function MapEngine({
         )
       }
     })
-  }, [counties, colorScale, geojsonData])
+  }, [counties, colorScale, geojsonData, onCountyClick]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Highlight focused county ────────────────────────────────────
   useEffect(() => {

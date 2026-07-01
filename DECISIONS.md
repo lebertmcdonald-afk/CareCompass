@@ -165,7 +165,7 @@ Copy this template and append it to the relevant section (Design, Architecture, 
 
 ---
 
-### A03 — Direct inline Supabase calls; no custom hook layer (yet)
+### A06 — Direct inline Supabase calls; no custom hook layer (yet)
 
 **Decision:** Components fetch Supabase data directly inline (`useEffect` + `supabase.from(...)`), with local `useState` for data/loading/error. No `useClients()`-style custom hook or service/helper layer exists yet.
 

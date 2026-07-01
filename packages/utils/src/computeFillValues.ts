@@ -26,7 +26,9 @@ export function computeFillValues(rows: RawCountyRow[]) {
       seniorPopulation:     r.seniors,
       isDesert:             r.is_desert === 'True',
       tooltip: {
-        headline: `${r.county}, ${r.state}`,
+        headline: r.is_desert === 'True'
+          ? `Care desert — ${r.agencies} ${r.agencies === 1 ? 'agency' : 'agencies'}`
+          : `${r.county}, ${r.state}`,
         stats: [
           { label: 'Home health agencies',    value: String(r.agencies) },
           { label: 'Agencies per 1k seniors', value: r.per_1k_seniors.toFixed(1) },
