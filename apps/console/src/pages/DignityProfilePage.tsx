@@ -10,6 +10,7 @@ type FormState = {
   name: string
   nickname: string
   preferred_language: string
+  gender_preference: string
   comfort_note: string
   avoid_note: string
 }
@@ -18,6 +19,7 @@ const EMPTY_FORM: FormState = {
   name: '',
   nickname: '',
   preferred_language: '',
+  gender_preference: '',
   comfort_note: '',
   avoid_note: '',
 }
@@ -35,7 +37,7 @@ export function DignityProfilePage({ mode }: { mode: Mode }) {
     if (mode === 'create' || !id) return
     supabase
       .from('client_profiles')
-      .select('name, nickname, preferred_language, comfort_note, avoid_note')
+      .select('name, nickname, preferred_language, gender_preference, comfort_note, avoid_note')
       .eq('id', id)
       .single()
       .then(({ data, error }) => {
@@ -46,6 +48,7 @@ export function DignityProfilePage({ mode }: { mode: Mode }) {
             name: data.name ?? '',
             nickname: data.nickname ?? '',
             preferred_language: data.preferred_language ?? '',
+            gender_preference: data.gender_preference ?? '',
             comfort_note: data.comfort_note ?? '',
             avoid_note: data.avoid_note ?? '',
           })
@@ -55,7 +58,7 @@ export function DignityProfilePage({ mode }: { mode: Mode }) {
   }, [id, mode])
 
   function handleChange(field: keyof FormState) {
-    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       setForm(prev => ({ ...prev, [field]: e.target.value }))
   }
 
@@ -69,6 +72,7 @@ export function DignityProfilePage({ mode }: { mode: Mode }) {
       name: form.name.trim(),
       nickname: form.nickname.trim() || null,
       preferred_language: form.preferred_language.trim() || null,
+      gender_preference: form.gender_preference || null,
       comfort_note: form.comfort_note.trim() || null,
       avoid_note: form.avoid_note.trim() || null,
     }
@@ -186,6 +190,26 @@ export function DignityProfilePage({ mode }: { mode: Mode }) {
                 placeholder="e.g. Spanish, Mandarin"
                 autoComplete="off"
               />
+            )}
+          </div>
+
+          <div className="field-group">
+            <label className="field-label" htmlFor="field-gender-pref">
+              Gender preference for aide <span className="field-optional">optional</span>
+            </label>
+            {isReadOnly ? (
+              <p id="field-gender-pref" className="field-value">{form.gender_preference || 'No preference'}</p>
+            ) : (
+              <select
+                id="field-gender-pref"
+                className="field-select"
+                value={form.gender_preference}
+                onChange={handleChange('gender_preference')}
+              >
+                <option value="">No preference</option>
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+              </select>
             )}
           </div>
 

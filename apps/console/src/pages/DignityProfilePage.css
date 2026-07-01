@@ -77,7 +77,8 @@
 }
 
 .field-input,
-.field-textarea {
+.field-textarea,
+.field-select {
   font-size: var(--text-base);
   font-family: inherit;
   color: var(--text-primary);
@@ -92,7 +93,8 @@
 }
 
 .field-input:focus,
-.field-textarea:focus {
+.field-textarea:focus,
+.field-select:focus {
   border-color: var(--teal-action);
 }
 
